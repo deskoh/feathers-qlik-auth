@@ -1,0 +1,21 @@
+{
+  "host": "HOST",
+  "port": "PORT",
+  "authentication": {
+    "oauth": {
+      "cognito": {
+        "key": "COGNITO_CLIENT_ID",
+        "secret": "COGNITO_SECRET",
+        "callback": "COGNITO_CALLBACK_URL",
+        "base_url": "COGNITO_BASEURL",
+        "userPoolId": "COGNITO_USER_POOL_ID"
+      }
+    }
+  },
+  "qlik": {
+    "userDirectory": "QLIK_DOMAIN",
+    "rootCa": "QLIK_ROOT_CA",
+    "clientKey": "QLIK_CLIENT_KEY",
+    "clientCert": "QLIK_CLIENT_CERT"
+  }
+}
