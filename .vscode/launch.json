@@ -11,11 +11,13 @@
       "skipFiles": [
         "<node_internals>/**"
       ],
-      "program": "${workspaceFolder}\\src",
-      "preLaunchTask": "tsc: build - tsconfig.json",
+      "program": "${workspaceFolder}\\lib\\index.js",
+      // "preLaunchTask": "tsc: build - tsconfig.json",
       "outFiles": [
         "${workspaceFolder}/lib/**/*.js"
-      ]
+      ],
+      "outputCapture": "std",
+      "internalConsoleOptions": "openOnSessionStart"
     }
   ]
 }

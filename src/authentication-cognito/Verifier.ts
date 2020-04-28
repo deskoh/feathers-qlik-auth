@@ -1,8 +1,9 @@
 // Reference: https://github.com/awslabs/aws-support-tools/blob/master/Cognito/decode-verify-jwt/decode-verify-jwt.ts
 
-import {promisify} from 'util';
+import { promisify } from 'util';
 import * as Axios from 'axios';
 import * as jsonwebtoken from 'jsonwebtoken';
+
 const jwkToPem = require('jwk-to-pem');
 
 export interface ClaimVerifyRequest {
@@ -54,6 +55,7 @@ const verifyPromised = promisify(jsonwebtoken.verify.bind(jsonwebtoken));
 
 export default class Verifier {
   private cognitoIssuer: string;
+
   private cacheKeys: MapOfKidToPublicKey | undefined;
 
   constructor(userPoolId: string, region: string) {
@@ -70,13 +72,12 @@ export default class Verifier {
       const publicKeys = await Axios.default.get<PublicKeys>(url);
       this.cacheKeys = publicKeys.data.keys.reduce((agg, current) => {
         const pem = jwkToPem(current);
-        agg[current.kid] = {instance: current, pem};
+        agg[current.kid] = { instance: current, pem };
         return agg;
       }, {} as MapOfKidToPublicKey);
       return this.cacheKeys;
-    } else {
-      return this.cacheKeys;
     }
+    return this.cacheKeys;
   };
 
   private verify = async (token: string, tokenUse: 'id' | 'access'): Promise<ClaimVerifyResult> => {
@@ -94,7 +95,7 @@ export default class Verifier {
         throw new Error('claim made for unknown kid');
       }
       const claim = await verifyPromised(token, key.pem) as Claim;
-      const currentSeconds = Math.floor( (new Date()).valueOf() / 1000);
+      const currentSeconds = Math.floor((new Date()).valueOf() / 1000);
       if (currentSeconds > claim.exp || Math.abs(currentSeconds - claim.auth_time) > 1) {
         throw new Error('claim is expired or invalid');
       }
@@ -105,11 +106,13 @@ export default class Verifier {
         throw new Error(`claim use is not ${tokenUse}`);
       }
       console.log(`claim confirmed for ${claim.username}`);
-      result = {userName: claim.username, clientId: claim.client_id, isValid: true};
+      result = { userName: claim.username, clientId: claim.client_id, isValid: true };
     } catch (error) {
       console.error(error);
-      result = {userName: '', clientId: '', error, isValid: false};
+      result = {
+        userName: '', clientId: '', error, isValid: false,
+      };
     }
     return result;
   };
-};
+}

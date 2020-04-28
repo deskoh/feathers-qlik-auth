@@ -11,7 +11,7 @@ declare module './declarations' {
   }
 }
 
-export default function(app: Application) {
+export default function (app: Application): void {
   const authentication = new AuthenticationService(app);
 
   const cognitoConfig = updateConfig(app.get('authentication').oauth.cognito);

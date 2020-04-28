@@ -4,13 +4,10 @@ import { Application } from '../declarations';
 
 
 export default function (app: Application) {
-
-  const qlikConfig = app.get('qlik');
-
   const expressSession = session({
     secret: Math.random().toString(36).substring(7),
     saveUninitialized: false,
-    resave: true
+    resave: true,
   });
   app.use(expressSession);
 
@@ -18,12 +15,12 @@ export default function (app: Application) {
     res.send('OK');
   });
 
-  app.get('/qlik/login', (req, res, next) => {
+  app.get('/qlik/login', (req, res) => {
     if (!req.query.targetId || !req.query.proxyRestUri) {
       res.send('Required params missing');
     } else {
-      console.log("proxyRestUri: " + req.query.proxyRestUri);
-      console.log("targetId: " + req.query.targetId);
+      console.log(`proxyRestUri: ${req.query.proxyRestUri}`);
+      console.log(`targetId: ${req.query.targetId}`);
     }
     req.session!.proxyRestUri = req.query.proxyRestUri;
     req.session!.targetId = req.query.targetId;
