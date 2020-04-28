@@ -6,7 +6,6 @@
       "cognito": {
         "key": "COGNITO_CLIENT_ID",
         "secret": "COGNITO_SECRET",
-        "callback": "COGNITO_CALLBACK_URL",
         "base_url": "COGNITO_BASEURL",
         "userPoolId": "COGNITO_USER_POOL_ID"
       }

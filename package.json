@@ -26,6 +26,8 @@
     "test": "npm run compile && npm run mocha",
     "dev": "ts-node-dev --no-notify src/",
     "start": "npm run compile && node lib/",
+    "start:docker": "docker run --rm -it -p 3030:3030 --env-file ./.env qlik-auth",
+    "build:docker": "docker build -t qlik-auth .",
     "eslint": "eslint --ext ts,js .",
     "mocha": "ts-mocha \"test/**/*.ts\" --recursive --exit",
     "compile": "shx rm -rf lib/ && tsc"
