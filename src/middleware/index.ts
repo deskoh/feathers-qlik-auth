@@ -16,10 +16,11 @@ export default function (app: Application) {
   });
 
   app.get('/qlik/login', (req, res) => {
-    if (!req.query.targetId || !req.query.proxyRestUri) {
+    const proxyRestUri = app.get('qlik').proxyRestUri || req.query.proxyRestUri;
+    if (!req.query.targetId) {
       res.send('Required params missing');
     } else {
-      console.log(`proxyRestUri: ${req.query.proxyRestUri}`);
+      console.log(`proxyRestUri: ${proxyRestUri}`);
       console.log(`targetId: ${req.query.targetId}`);
     }
     req.session!.proxyRestUri = req.query.proxyRestUri;

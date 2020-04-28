@@ -23,6 +23,7 @@
     }
   },
   "qlik": {
+    "proxyRestUri": "",
     "userDirectory": "SomeDomain",
     "rootCa": "../certs/ca.pem",
     "clientKey": "../certs/client_key.pem",

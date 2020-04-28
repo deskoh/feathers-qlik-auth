@@ -12,6 +12,7 @@
     }
   },
   "qlik": {
+    "proxyRestUri": "QLIK_PROXY_URI",
     "userDirectory": "QLIK_DOMAIN",
     "rootCa": "QLIK_ROOT_CA",
     "clientKey": "QLIK_CLIENT_KEY",
