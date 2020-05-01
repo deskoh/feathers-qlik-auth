@@ -8,6 +8,7 @@ module.exports = {
     project: './tsconfig.json',
   },
   "rules": {
+    "@typescript-eslint/no-explicit-any": "off",
     "import/extensions": "off",
     "no-console": "off",
   }
