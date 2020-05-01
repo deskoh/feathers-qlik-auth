@@ -18,6 +18,7 @@ ENV NODE_ENV=production
 
 ENV HOST=localhost \
     PORT=3030 \
+    SESSION_EXPIRY=5m \
     COGNITO_CLIENT_ID= \
     COGNITO_SECRET= \
     COGNITO_BASEURL= \

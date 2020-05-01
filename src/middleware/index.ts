@@ -6,7 +6,6 @@ export default function (app: Application): void {
   app.use(session);
 
   app.get('/', (_req, res) => {
-    console.log(_req.session);
     res.send('OK');
   });
 

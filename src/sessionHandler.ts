@@ -1,8 +1,9 @@
 import rnd from 'crypto-random-string';
 import session from 'express-session';
 import memorystore from 'memorystore';
+import ms from 'ms';
 
-const sessionLen = 5 * 60 * 1000;
+const sessionLen = ms(process.env.SESSION_EXPIRY || '5m');
 const MemoryStore = memorystore(session);
 
 export default session({
