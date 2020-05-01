@@ -3,8 +3,7 @@
 import { promisify } from 'util';
 import * as Axios from 'axios';
 import * as jsonwebtoken from 'jsonwebtoken';
-
-const jwkToPem = require('jwk-to-pem');
+import jwkToPem from 'jwk-to-pem';
 
 export interface ClaimVerifyRequest {
   readonly token?: string;
@@ -62,9 +61,9 @@ export default class Verifier {
     this.cognitoIssuer = `https://cognito-idp.${region}.amazonaws.com/${userPoolId}`;
   }
 
-  public verifyAccessToken = (token: string) => this.verify(token, 'access');
+  public verifyAccessToken = (token: string): Promise<ClaimVerifyResult> => this.verify(token, 'access');
 
-  public verifyIdToken = (token: string) => this.verify(token, 'id');
+  public verifyIdToken = (token: string): Promise<ClaimVerifyResult> => this.verify(token, 'id');
 
   private getPublicKeys = async (): Promise<MapOfKidToPublicKey> => {
     if (!this.cacheKeys) {
@@ -72,6 +71,7 @@ export default class Verifier {
       const publicKeys = await Axios.default.get<PublicKeys>(url);
       this.cacheKeys = publicKeys.data.keys.reduce((agg, current) => {
         const pem = jwkToPem(current);
+        // eslint-disable-next-line no-param-reassign
         agg[current.kid] = { instance: current, pem };
         return agg;
       }, {} as MapOfKidToPublicKey);
@@ -96,7 +96,7 @@ export default class Verifier {
       }
       const claim = await verifyPromised(token, key.pem) as Claim;
       const currentSeconds = Math.floor((new Date()).valueOf() / 1000);
-      if (currentSeconds > claim.exp || Math.abs(currentSeconds - claim.auth_time) > 1) {
+      if (currentSeconds > claim.exp || Math.abs(currentSeconds - claim.auth_time) > 5) {
         throw new Error('claim is expired or invalid');
       }
       if (claim.iss !== this.cognitoIssuer) {

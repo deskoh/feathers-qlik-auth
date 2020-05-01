@@ -4,6 +4,7 @@ import { expressOauth } from '@feathersjs/authentication-oauth';
 
 import { Application } from './declarations';
 import { CognitoStrategy, updateConfig } from './authentication-cognito';
+import session from './sessionHandler';
 
 declare module './declarations' {
   interface ServiceTypes {
@@ -19,5 +20,8 @@ export default function (app: Application): void {
   authentication.register('cognito', new CognitoStrategy(cognitoConfig.userPoolId, cognitoConfig.region, qlikConfig) as any);
 
   app.use('/authentication', authentication);
-  app.configure(expressOauth());
+
+  app.configure(expressOauth({
+    expressSession: session,
+  }));
 }

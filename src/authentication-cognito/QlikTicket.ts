@@ -14,9 +14,14 @@ const readFileIfExists = (fileOrString: string | undefined): Buffer | string => 
 };
 
 export interface QlikTicketConfig {
-  rootCa?: string;
-  clientKey?: string;
-  clientCert?: string;
+  rootCa: string;
+  clientKey: string;
+  clientCert: string;
+  userDirectory: string;
+  /**
+   * Optional for overidding original proxyRestUri query parameters.
+   */
+  proxyRestUri?: string;
 }
 
 export default class QlikTicket {
@@ -38,12 +43,18 @@ export default class QlikTicket {
   }
 
   public async getRedirectUrl(
-    userId: string, userDirectory: string, proxyRestUri: string, targetId: string,
+    userId: string, proxyRestUri: string, targetId: string,
   ): Promise<string | null> {
     const randomString = rnd({ length: 16 });
-    const url = `${proxyRestUri}/ticket?xrfkey=${randomString}`;
+
+    let proxyUri = proxyRestUri;
+    if (this.options.proxyRestUri) {
+      proxyUri = this.options.proxyRestUri;
+      console.log(`proxyRestUri overidden to ${proxyUri}`);
+    }
+    const url = `${proxyUri}/ticket?xrfkey=${randomString}`;
     const response = await Axios.default.post(url, {
-      UserDirectory: userDirectory,
+      UserDirectory: this.options.userDirectory,
       UserId: userId,
       Attributes: [],
       TargetId: targetId,
@@ -51,18 +62,13 @@ export default class QlikTicket {
       headers: {
         'content-type': 'application/json',
         'X-Qlik-xrfkey': randomString,
-        'X-Qlik-user': `UserDirectory=${userDirectory};UserId=${userId}`,
+        'X-Qlik-user': `UserDirectory=${this.options.userDirectory};UserId=${userId}`,
       },
       httpsAgent: this.httpsAgent,
     });
 
-    console.log(response.status);
-
-    if (response.status < 400) {
-      // TODO: verify XRF string
-      console.log('== Got a ticket ==');
-      console.log(`Ticket: ${response.data.Ticket}`);
-      console.log(`TargetUri: ${response.data.TargetUri}`);
+    if (response.status === 201) {
+      console.log(`Ticket: ${response.data.Ticket}, TargetUri: ${response.data.TargetUri}`);
 
       return `${response.data.TargetUri}?QlikTicket=${response.data.Ticket}`;
     }
