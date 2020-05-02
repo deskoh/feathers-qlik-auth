@@ -7,9 +7,10 @@ import configuration from '@feathersjs/configuration';
 import express from '@feathersjs/express';
 
 import { Application } from './declarations';
-import logger from './logger';
 import middleware from './middleware';
 import authentication from './authentication';
+import errorLogger from './errorLogger';
+import suppressErrorDetails from './suppressErrorDetails';
 // Don't remove this comment. It's needed to format import lines nicely.
 
 const app: Application = express(feathers());
@@ -33,8 +34,16 @@ app.configure(authentication);
 
 // Configure a middleware for 404s and the error handler
 app.use(express.notFound());
+
+// Log full errors before suppressed
+app.use(errorLogger());
+// Rempve verbose error message in production mode.
+if (process.env.NODE_ENV !== 'development') {
+  app.use(suppressErrorDetails());
+}
+
 app.use(express.errorHandler({
-  logger,
+  logger: undefined,
   html: false,
 } as any));
 

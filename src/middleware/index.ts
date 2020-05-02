@@ -1,3 +1,5 @@
+import { BadRequest } from '@feathersjs/errors';
+
 import { Application } from '../declarations';
 import session from '../sessionHandler';
 // Don't remove this comment. It's needed to format import lines nicely.
@@ -30,8 +32,14 @@ export default function (app: Application): void {
     if (req.session) {
       req.feathers.targetId = req.session.targetId;
       req.feathers.proxyRestUri = req.session.proxyRestUri;
-    } else {
-      throw new Error('Session not available');
+    }
+    next();
+  });
+
+  app.get('/qlik/oauth/cognito/callback', (req, res, next) => {
+    // Handle case where login takes too long
+    if (!req.session?.grant) {
+      throw new BadRequest('Login session expired');
     }
     next();
   });
