@@ -12,7 +12,8 @@ export default class CognitoStrategy extends OAuthStrategy {
 
   constructor(userPoolId: string, region: string, qlikConfig: QlikTicketConfig) {
     super();
-    this.verifier = new Verifier(userPoolId, region);
+    const issuer = `https://cognito-idp.${region}.amazonaws.com/${userPoolId}`;
+    this.verifier = new Verifier(issuer);
     this.ticket = new QlikTicket(qlikConfig);
   }
 
@@ -35,13 +36,16 @@ export default class CognitoStrategy extends OAuthStrategy {
 
   async authenticate(authentication: AuthenticationRequest): Promise<any> {
     if (authentication.error) throw new Error(JSON.stringify(authentication.error));
-    const result = await this.verifier.verifyAccessToken(authentication.access_token);
+    const result = await this.verifier.verifyIdToken(
+      authentication.id_token.header, authentication.raw.id_token,
+    );
     if (result.isValid) {
+      console.log(`token verified for ${result.username}`);
       return {
         authentication: { strategy: this.name || '' },
-        user: { username: result.userName },
+        user: { username: result.username },
       };
     }
-    throw new Error('Invalid token signature.');
+    throw result.error ?? new Error('Invalid token signature.');
   }
 }
