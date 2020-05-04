@@ -59,16 +59,16 @@ interface JWT {
   token_use: 'id' | 'token';
 }
 
-interface AccessToken extends JWT {
+export interface AccessToken extends JWT {
   token_use: 'token';
   scope: string;
   client_id: string;
   username: string;
 }
 
-interface IdToken extends JWT {
+export interface IdToken extends JWT {
   /**
-   * ClientID for ID Token,
+   * ClientID for ID Token.
    */
   aud: string;
   /**

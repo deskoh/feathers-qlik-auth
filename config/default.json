@@ -28,5 +28,28 @@
     "rootCa": "../certs/ca.pem",
     "clientKey": "../certs/client_key.pem",
     "clientCert": "../certs/client_cert.pem"
+  },
+  "mockCognito": {
+    "path": "/mockCognito",
+    "atPayload": {
+      "cognito:groups": [
+        "MyGroup"
+      ],
+      "username": "anonoymous",
+      "version": 2
+    },
+    "idPayload": {
+      "sub": "75b327dc-c42c-41c9-8c3f-8b2f462c617a",
+      "cognito:groups": [
+        "MyGroup"
+      ],
+      "name": "Anonoymous",
+      "cognito:username": "anonoymous"
+    },
+    "userInfo": {
+      "sub": "75b327dc-c42c-41c9-8c3f-8b2f462c617a",
+      "name": "Anonymous",
+      "username": "anonoymous"
+    }
   }
 }

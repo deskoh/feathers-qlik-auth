@@ -2,6 +2,7 @@ import { BadRequest } from '@feathersjs/errors';
 
 import { Application } from '../declarations';
 import session from '../sessionHandler';
+import mockCognito from './mockCognito';
 // Don't remove this comment. It's needed to format import lines nicely.
 
 export default function (app: Application): void {
@@ -10,6 +11,8 @@ export default function (app: Application): void {
   app.get('/', (_req, res) => {
     res.send('OK');
   });
+
+  const oauthPath = app.get('authentication').oauth.defaults?.path || '/oauth';
 
   app.get('/qlik/login', (req, res) => {
     if (!req.query.targetId || !req.query.proxyRestUri) {
@@ -26,7 +29,7 @@ export default function (app: Application): void {
     }
   });
 
-  app.get('/qlik/oauth/cognito/authenticate', (req, res, next) => {
+  app.get(`${oauthPath}/cognito/authenticate`, (req, res, next) => {
     // Inject qlik info from session into feathers params.
     req.feathers = req.feathers || {};
     if (req.session) {
@@ -36,11 +39,16 @@ export default function (app: Application): void {
     next();
   });
 
-  app.get('/qlik/oauth/cognito/callback', (req, res, next) => {
+  app.get(`${oauthPath}/cognito/callback`, (req, res, next) => {
     // Handle case where login takes too long
     if (!req.session?.grant) {
       throw new BadRequest('Login session expired');
     }
     next();
   });
+
+  if (process.env.NODE_ENV === 'development' && app.get('mockCognito')) {
+    app.configure(mockCognito(app.get('mockCognito')));
+    console.log('Mock Cognito configured.');
+  }
 }
