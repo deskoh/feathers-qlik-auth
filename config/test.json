@@ -1,1 +1,7 @@
-{}
+{
+  "authentication": {
+    "cognito": {
+      "base_url": "http://localhost:3030/mockCognito/oauth2"
+    }
+  }
+}

@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/camelcase */
-import { BadRequest } from '@feathersjs/errors';
-import { Application } from '@feathersjs/express';
+import { Express } from 'express';
 
 import jwt from './createJwt';
 
@@ -14,7 +13,7 @@ interface MockOidcServerOptions {
   userInfo: any;
 }
 
-export default (options?: MockOidcServerOptions): (app: Application) => void => {
+export default (options?: MockOidcServerOptions): (app: Express) => void => {
   const opts: Required<MockOidcServerOptions> = {
     path: '/mockCognito',
     authorize: 'oauth2/authorize',
@@ -26,16 +25,18 @@ export default (options?: MockOidcServerOptions): (app: Application) => void => 
     ...options,
   };
 
-  return (app: Application): void => {
+  return (app: Express): void => {
     app.get(`${opts.path}/${opts.authorize}`, (req, res, next) => {
       const {
         query: {
           client_id, response_type, redirect_uri, scope, nounce,
         },
       } = req;
-      console.log(client_id, response_type, redirect_uri, scope, nounce);
+      console.log(`[MockCognito] client_id: ${client_id}, response_type: ${response_type}`
+        + `redirect_uri: ${redirect_uri}, scope: ${scope}, nounce: ${nounce}`);
       if (!redirect_uri) {
-        next(new BadRequest('redirect_uri not sepecified'));
+        // 400 Bad Request
+        next(new Error('redirect_uri not sepecified'));
         return;
       }
       res.redirect(`${redirect_uri}?code=dummy_access_code`);
@@ -83,5 +84,7 @@ export default (options?: MockOidcServerOptions): (app: Application) => void => 
     app.get(`${opts.path}/.well-known/jwks.json`, (req, res) => {
       res.json({ keys: [jwt.jwk] });
     });
+
+    console.log('Mock Cognito configured.');
   };
 };

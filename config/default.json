@@ -2,28 +2,25 @@
   "host": "localhost",
   "port": 3030,
   "authentication": {
-    "entity": null,
-    "secret": "not_in_use",
-    "oauth": {
-      "redirect": "/",
-      "defaults": {
-        "path": "/qlik/oauth"
-      },
-      "cognito": {
-        "oauth": 2,
-        "scope": ["openid"],
-        "scope_delimiter": " ",
-        "key": "<cognito client id>",
-        "secret": "<cognito client secret>",
-        "base_url": "https://<cognito userpool domain>/oauth2",
-        "userPoolId": "<userPoolId>",
-        "region": "ap-southeast-1",
-        "nonce": true
-      }
+    "defaults": {
+      "prefix": "/qlik",
+      "transport": "session"
+    },
+    "cognito": {
+      "callback": "/qlik/callback",
+      "oauth": 2,
+      "scope": ["openid"],
+      "scope_delimiter": " ",
+      "key": "<cognito client id>",
+      "secret": "<cognito client secret>",
+      "base_url": "https://<cognito userpool domain>/oauth2",
+      "userPoolId": "<userPoolId>",
+      "region": "ap-southeast-1",
+      "nonce": true
     }
   },
   "qlik": {
-    "proxyRestUri": "",
+    "proxyRestUri": "http://localhost:3030/mockQlik",
     "userDirectory": "SomeDomain",
     "rootCa": "../certs/ca.pem",
     "clientKey": "../certs/client_key.pem",

@@ -1,6 +1,6 @@
 import logger from './logger';
 
-export default (errorStack = false) => (
+export default (errorStack = true) => (
   (error: any, _req: any, _res: any, next: any): any => {
     const { message, data } = error;
     logger.info({

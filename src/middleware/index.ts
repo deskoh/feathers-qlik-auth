@@ -1,18 +1,17 @@
-import { BadRequest } from '@feathersjs/errors';
+import config from 'config';
+import { Express } from 'express';
 
-import { Application } from '../declarations';
 import session from '../sessionHandler';
 import mockCognito from './mockCognito';
+import mockQlik from './mockQlik';
 // Don't remove this comment. It's needed to format import lines nicely.
 
-export default function (app: Application): void {
+export default (app: Express): void => {
   app.use(session);
 
   app.get('/', (_req, res) => {
     res.send('OK');
   });
-
-  const oauthPath = app.get('authentication').oauth.defaults?.path || '/oauth';
 
   app.get('/qlik/login', (req, res) => {
     if (!req.query.targetId || !req.query.proxyRestUri) {
@@ -29,26 +28,10 @@ export default function (app: Application): void {
     }
   });
 
-  app.get(`${oauthPath}/cognito/authenticate`, (req, res, next) => {
-    // Inject qlik info from session into feathers params.
-    req.feathers = req.feathers || {};
-    if (req.session) {
-      req.feathers.targetId = req.session.targetId;
-      req.feathers.proxyRestUri = req.session.proxyRestUri;
-    }
-    next();
-  });
 
-  app.get(`${oauthPath}/cognito/callback`, (req, res, next) => {
-    // Handle case where login takes too long
-    if (!req.session?.grant) {
-      throw new BadRequest('Login session expired');
-    }
-    next();
-  });
-
-  if (process.env.NODE_ENV === 'development' && app.get('mockCognito')) {
-    app.configure(mockCognito(app.get('mockCognito')));
-    console.log('Mock Cognito configured.');
+  const isNonProduction = process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test';
+  if (isNonProduction && config.has('mockCognito')) {
+    mockCognito(config.get<any>('mockCognito'))(app);
+    mockQlik()(app);
   }
-}
+};

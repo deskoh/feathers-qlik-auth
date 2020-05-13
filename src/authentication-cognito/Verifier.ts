@@ -106,10 +106,20 @@ export default class Verifier {
     return this.cacheKeys;
   };
 
+  private static getTokenHeader(token: string): TokenHeader {
+    const tokenSections = (token || '').split('.');
+    if (tokenSections.length < 2) {
+      throw new Error('requested token is invalid');
+    }
+    const headerJSON = Buffer.from(tokenSections[0], 'base64').toString('utf8');
+    return JSON.parse(headerJSON) as TokenHeader;
+  }
+
   private async verifyToken(header: TokenHeader, token: string, tokenUse: string): Promise<Claim> {
     let issuer = this.cognitoIssuer;
-    // Allow keys issuer to be overriden by token for development.
-    if (process.env.NODE_ENV === 'development') {
+    // Allow keys issuer to be overriden by token for non-production.
+    const isNonProduction = process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test';
+    if (isNonProduction) {
       const payload = JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString('utf8'));
       if (payload.iss && payload.iss !== issuer) {
         issuer = payload.iss;
@@ -140,12 +150,7 @@ export default class Verifier {
   }
 
   public async verifyAccessToken(token: string): Promise<VerifyResult> {
-    const tokenSections = (token || '').split('.');
-    if (tokenSections.length < 2) {
-      throw new Error('requested token is invalid');
-    }
-    const headerJSON = Buffer.from(tokenSections[0], 'base64').toString('utf8');
-    const header = JSON.parse(headerJSON) as TokenHeader;
+    const header = Verifier.getTokenHeader(token);
 
     let result: VerifyResult;
     try {
@@ -163,7 +168,9 @@ export default class Verifier {
     return result;
   }
 
-  public async verifyIdToken(header: TokenHeader, token: string): Promise<VerifyResult> {
+  public async verifyIdToken(token: string): Promise<VerifyResult> {
+    const header = Verifier.getTokenHeader(token);
+
     let result: VerifyResult;
     try {
       const claim = await this.verifyToken(header, token, 'id') as IdToken;

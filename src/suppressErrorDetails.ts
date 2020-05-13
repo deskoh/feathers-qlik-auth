@@ -1,11 +1,14 @@
 // Sanitize errors for production
 
-export default (suppressMessage = true) => (
+export default (suppressDetails = true) => (
   (error: any, _req: any, _res: any, next: any): any => {
-    // eslint-disable-next-line no-param-reassign
-    if (suppressMessage) delete error.message;
-    // eslint-disable-next-line no-param-reassign
-    delete error.data;
-    next(error);
+    if (!suppressDetails) next(error);
+
+    const newError = {
+      ...error,
+      code: 404,
+      message: 'Not found',
+    };
+    next(newError);
   }
 );

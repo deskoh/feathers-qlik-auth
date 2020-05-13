@@ -8,19 +8,74 @@
       "type": "node",
       "request": "launch",
       "name": "Launch Program",
-      "skipFiles": [
-        "<node_internals>/**"
-      ],
       "env": {
-        "NODE_ENV": "development"
+        "NODE_ENV": "development",
+        "TS_NODE_FILES": "true"
       },
-      "program": "${workspaceFolder}\\lib\\index.js",
-      // "preLaunchTask": "tsc: build - tsconfig.json",
-      "outFiles": [
-        "${workspaceFolder}/lib/**/*.js"
-      ],
-      "outputCapture": "std",
+      "args": ["${workspaceFolder}\\src\\index.ts"],
+      "runtimeArgs": ["-r", "ts-node/register"],
+      "cwd": "${workspaceFolder}",
       "internalConsoleOptions": "openOnSessionStart"
+    },
+    {
+      "name": "Launch Program (Watch)",
+      "type": "node",
+      "request": "launch",
+      "protocol": "inspector",
+      "cwd": "${workspaceFolder}",
+      "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/ts-node-dev",
+      "env": {
+        "TS_NODE_FILES": "true"
+      },
+      "args": [
+        "--inspect",
+        "--no-notify",
+        "--transpileOnly",
+        "--respawn",
+        "${workspaceFolder}/src"
+      ],
+      "console": "integratedTerminal",
+      "restart": true
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Debug Current Test",
+      "program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
+      "env": {
+        "TS_NODE_FILES": "true",
+        "NODE_ENV": "test"
+      },
+      "args": [
+        "-r",
+        "ts-node/register/transpile-only",
+        "--timeout",
+        "999999",
+        "--colors",
+        "--exit",
+        "**/${fileBasename}"
+      ],
+      "console": "integratedTerminal"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Debug Tests",
+      "program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
+      "env": {
+        "TS_NODE_FILES": "true",
+        "NODE_ENV": "test"
+      },
+      "args": [
+        "-r",
+        "ts-node/register/transpile-only",
+        "--timeout",
+        "999999",
+        "--colors",
+        "--exit",
+        "test/**/*.ts"
+      ],
+      "console": "integratedTerminal"
     }
   ]
 }
