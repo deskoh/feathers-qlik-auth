@@ -1,7 +1,10 @@
 {
   "authentication": {
     "cognito": {
-      "base_url": "http://localhost:3030/mockCognito/oauth2"
+      "subdomain": "localhost",
+      "authorize_url": "http://[subdomain]/mockCognito/oauth2/authorize",
+      "access_url": "http://[subdomain]/mockCognito/oauth2/token",
+      "profile_url": "http://[subdomain]/mockCognito/oauth2/userInfo"
     }
   }
 }

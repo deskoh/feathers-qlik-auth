@@ -11,9 +11,9 @@
       "oauth": 2,
       "scope": ["openid"],
       "scope_delimiter": " ",
+      "subdomain": "{domain}.{region}.amazoncognito.com",
       "key": "<cognito client id>",
       "secret": "<cognito client secret>",
-      "base_url": "https://<cognito userpool domain>/oauth2",
       "userPoolId": "<userPoolId>",
       "region": "ap-southeast-1",
       "nonce": true

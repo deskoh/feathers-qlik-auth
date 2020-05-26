@@ -27,15 +27,10 @@ export default (app: Express): void => {
   const origin = `${protocol}://${host}`;
 
   const grantConfig = {
+    ...authConfig,
     defaults: {
       origin,
       ...authConfig.defaults,
-    },
-    cognito: {
-      authorize_url: `${cognitoConfig.base_url}/authorize`,
-      access_url: `${cognitoConfig.base_url}/token`,
-      profile_url: `${cognitoConfig.base_url}/userInfo`,
-      ...authConfig.cognito,
     },
   };
 
